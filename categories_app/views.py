@@ -1,7 +1,8 @@
 from django.shortcuts import render
 from rest_framework.views import APIView,Response
-from .models import Category
+from .models import Category, Post
 from django.core.serializers import serialize
+from .serializer import PostSerializer
 import json
 # Create your views here.
 class AllCategories(APIView):
@@ -16,23 +17,57 @@ class AllCategories(APIView):
         return Response(json.loads(serialized))
 
 class CategoryById(APIView):
-    def get():
-        pass
-    def put():
-        pass
-    def delete():
-        pass
+    def get(self, request, category_id):
+        category = Category.objects.get(id=category_id)
+        serialized= serialize('json', [category])
+        json_cat= json.loads(serialized)
+        return Response(json_cat)
+    
+    def put(self, request, category_id):
+        category = Category.objects.get(id=category_id)
+        category.name = request.data['name']
+        serialized = serialize('json',[category])
+        json_category = json.loads(serialized)
+        return Response(json_category)
+        
+
+    def delete(self, request,category_id):
+        category = Category.objects.get(id=category_id)
+        category.delete()
+        return Response(f"The {category.name} category, has been deleted")
+    
+        
 
 class AllPostsInCategory(APIView):
-    def get():
-        pass
-    def post():
-        pass
+    def get(self, request, category_id):
+        category = Category.objects.get(id=category_id)
+        posts = category.get_posts()
+        serializer =PostSerializer(posts, many=True)
+    
+        return Response(serializer.data)
+
+
+    
+    def post(self, request, category_id):
+        category = Category.objects.get(id=category_id)
+        post_data = request.data.copy()
+        post_data["category"] = category.id
+        serializer = PostSerializer(data=post_data)
+        if serializer.is_valid():
+            new_post = serializer.save()
+            
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
 
 class PostById(APIView):
-    def get():
+    def get(self, request, category_id, post_id):
+        post = Post.objects.get(id=post_id)
+        serialized=serialize("json", [post])
+        json_post = json.loads(serialized)
+        return Response(json_post)
+        
+    def put(self, request, post_id):
         pass
-    def put():
-        pass
-    def delete():
+    def delete(self, request, post_id):
         pass
