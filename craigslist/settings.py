@@ -81,8 +81,8 @@ DATABASES = {
         'NAME': 'craigslist_db',
         'USER': 'postgres',
         'PASSWORD': "postgres",
-        'HOST': 'localhost',
-        'PORT': 5446
+        'HOST': 'db',
+        'PORT': 5432
     }
 }
 
