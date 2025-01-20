@@ -62,12 +62,23 @@ class AllPostsInCategory(APIView):
 
 class PostById(APIView):
     def get(self, request, category_id, post_id):
+        category = Category.objects.get(id=category_id)
         post = Post.objects.get(id=post_id)
-        serialized=serialize("json", [post])
-        json_post = json.loads(serialized)
-        return Response(json_post)
+        if post in category.get_posts():
+            serialized=serialize("json", [post])
+            json_post = json.loads(serialized)
+            return Response(json_post)
+        return Response(f"post not in this category")
         
     def put(self, request, post_id):
-        pass
-    def delete(self, request, post_id):
-        pass
+        post = Post.objects.get(id=post_id)
+        serializer = PostSerializer(post, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        
+    def delete(self, request,category_id, post_id):
+        post = Post.objects.get(id=post_id)
+        post.delete()
+        return Response(f"The post titled '{post.title}' has been deleted")
+        
