@@ -1,7 +1,5 @@
 # Assessment 4: Django REST API
-to load data : 
-    `python manage.py loaddata backup.json`
-    
+
 
 ## Due Date
 - You will push up your PR on Tuesday at the beginning of class
